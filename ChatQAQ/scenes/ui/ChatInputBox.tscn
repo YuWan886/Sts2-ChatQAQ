@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://chatinputbox_scene"]
+
+[ext_resource type="Script" path="res://ChatQAQCode/UI/ChatInputBox.cs" id="1_chatinputbox"]
+
+[node name="ChatInputBox" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 400.0
+offset_bottom = 60.0
+script = ExtResource("1_chatinputbox")

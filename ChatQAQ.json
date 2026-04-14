@@ -1,0 +1,11 @@
+{
+  "id": "ChatQAQ",
+  "name": "ChatQAQ",
+  "author": "一条鱼丸_",
+  "description": "qaq",
+  "version": "v1.0.0",
+  "has_pck": true,
+  "has_dll": true,
+  "dependencies": [],
+  "affects_gameplay": true
+}
