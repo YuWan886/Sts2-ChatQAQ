@@ -70,6 +70,8 @@ public static class MainFile
             SettingsPanel.CloseRequested += () => SettingsPanel.Hide();
             HistoryPanel.CloseRequested += () => HistoryPanel.Hide();
 
+            HotkeyManager.Instance.OnQuickSendTriggered += OnQuickSendTriggered;
+
             Logger.Info("ChatQAQ UI created successfully!");
         }
         catch (Exception ex)
@@ -113,6 +115,18 @@ public static class MainFile
         catch (Exception ex)
         {
             Logger.Error($"Failed to set local player: {ex}");
+        }
+    }
+
+    private static void OnQuickSendTriggered(Vector2 position)
+    {
+        try
+        {
+            QuickSendManager.Instance.SendQuickInfoAtPosition(position);
+        }
+        catch (Exception ex)
+        {
+            Logger.Error($"Failed to send quick info: {ex}");
         }
     }
 }

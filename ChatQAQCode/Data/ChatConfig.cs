@@ -51,6 +51,15 @@ public class ChatConfig
     [SavedProperty]
     public float AutocompleteDebounceMs { get; set; } = 300f;
 
+    [SavedProperty]
+    public bool QuickSendEnabled { get; set; } = true;
+
+    [SavedProperty]
+    public Key QuickSendModifierKey { get; set; } = Key.Ctrl;
+
+    [SavedProperty]
+    public MouseButton QuickSendMouseButton { get; set; } = MouseButton.Right;
+
     public static ChatConfig CreateDefault()
     {
         return new ChatConfig();

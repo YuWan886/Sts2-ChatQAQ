@@ -25,6 +25,7 @@
 - ⌨️ **快捷键支持** - 自定义快捷键快速打开/关闭聊天输入框
 - 🔔 **提及通知** - 当被其他玩家提及时发出通知和提示音
 - 🎨 **可定制 UI** - 支持自定义聊天框位置和显示时长
+- 🧪 **快捷发送** - Ctrl + 右键点击卡牌、遗物或药水上时，可快速发送相关信息
 
 ### 安装方法
 
@@ -37,6 +38,7 @@
 - **T 键** - 打开/关闭聊天输入框
 - **发送消息** - 输入内容后按回车
 - **提及玩家** - 使用 @玩家名 格式提及他人
+- **快捷发送** - Ctrl + 右键点击卡牌、遗物或药水上时，可快速发送其信息到聊天框
 
 ---
 
@@ -52,6 +54,7 @@
 - ⌨️ **Hotkey Support** - Customizable hotkeys to quickly toggle chat input
 - 🔔 **Mention Notifications** - Audio and visual notifications when mentioned by other players
 - 🎨 **Customizable UI** - Adjustable chat box position and display duration
+- 🧪 **Quick Send** - Quickly send card, relic, and potion info by right-clicking over them
 
 ### Installation
 
@@ -64,6 +67,7 @@
 - **T Key** - Toggle chat input box
 - **Send Message** - Type content and press Enter
 - **Mention Players** - Use @PlayerName format to mention others
+- **Quick Send** - Right-clicking over cards, relics, or potions to quickly send their info to chat
 
 ---
 
@@ -104,5 +108,5 @@
 
 ---
 
-模组图标的猪猪：[**YuWanCard**](https://github.com/YuWan886/Sts2-YuWanCard)
-截图中使用的储君皮肤：[**Mesugaki Regent**](https://www.nexusmods.com/slaythespire2/mods/502)
+- 模组图标的猪猪：[**YuWanCard**](https://github.com/YuWan886/Sts2-YuWanCard)
+- 截图中使用的储君皮肤：[**Mesugaki Regent**](https://www.nexusmods.com/slaythespire2/mods/502)

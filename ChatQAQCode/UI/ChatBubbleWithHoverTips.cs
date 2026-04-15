@@ -161,6 +161,8 @@ public partial class ChatBubbleWithHoverTips : Control
         _speaker = speaker;
         _displayDuration = duration;
         
+        MainFile.Logger.Info($"ChatBubbleWithHoverTips.DoSetup: duration={duration}, _displayDuration={_displayDuration}");
+        
         if (speaker != null)
         {
             _side = speaker.Side == CombatSide.Player ? DialogueSide.Left : DialogueSide.Right;
@@ -361,6 +363,7 @@ public partial class ChatBubbleWithHoverTips : Control
     private void OnAnimateInFinished()
     {
         var displayTime = Math.Max(_displayDuration - 0.6, 1.0);
+        MainFile.Logger.Info($"ChatBubbleWithHoverTips.OnAnimateInFinished: _displayDuration={_displayDuration}, displayTime={displayTime}");
         GetTree().CreateTimer(displayTime).Timeout += async () => await AnimateOut();
     }
 

@@ -231,6 +231,7 @@ public class ChatManager : IDisposable
                 }
 
                 var duration = _configManager.CurrentConfig?.BubbleDisplayDuration ?? 3.0f;
+                MainFile.Logger.Info($"ChatManager.ShowSpeechBubble: BubbleDisplayDuration from config = {_configManager.CurrentConfig?.BubbleDisplayDuration}, duration = {duration}");
 
                 try
                 {
