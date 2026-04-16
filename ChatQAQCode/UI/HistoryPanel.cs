@@ -167,7 +167,7 @@ public partial class HistoryPanel : Control
 
         _messageList = new VBoxContainer();
         _messageList.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-        _messageList.AddThemeConstantOverride("separation", 6);
+        _messageList.AddThemeConstantOverride("separation", 8);
         _scrollContainer.AddChild(_messageList);
     }
 
@@ -339,7 +339,7 @@ public partial class HistoryPanel : Control
         Hide();
     }
 
-    private partial class MessageItem : Panel
+    private partial class MessageItem : PanelContainer
     {
         private ChatMessage _message = null!;
         private HBoxContainer _mainHBox = null!;
@@ -365,34 +365,29 @@ public partial class HistoryPanel : Control
 
         private void SetupUI()
         {
-            CustomMinimumSize = new Vector2(0, 85);
             SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            SizeFlagsVertical = SizeFlags.ShrinkBegin;
 
             var styleBox = StsUiStyles.CreateMessageStyle(_message.IsLocalPlayer);
             AddThemeStyleboxOverride("panel", styleBox);
 
             _mainHBox = new HBoxContainer();
-            _mainHBox.SetAnchorsPreset(LayoutPreset.FullRect);
             _mainHBox.AddThemeConstantOverride("separation", 8);
-            var padding = new MarginContainer();
-            padding.SetAnchorsPreset(LayoutPreset.FullRect);
-            padding.AddThemeConstantOverride("margin_left", 8);
-            padding.AddThemeConstantOverride("margin_right", 8);
-            padding.AddThemeConstantOverride("margin_top", 6);
-            padding.AddThemeConstantOverride("margin_bottom", 6);
-            AddChild(padding);
-            padding.AddChild(_mainHBox);
+            _mainHBox.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            AddChild(_mainHBox);
 
             _characterModel = FindCharacterById(_message.CharacterId ?? "");
 
             _contentContainer = new VBoxContainer();
             _contentContainer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-            _contentContainer.AddThemeConstantOverride("separation", 4);
+            _contentContainer.SizeFlagsVertical = SizeFlags.ShrinkBegin;
+            _contentContainer.AddThemeConstantOverride("separation", 6);
             _mainHBox.AddChild(_contentContainer);
 
             var headerRow = new HBoxContainer();
-            headerRow.AddThemeConstantOverride("separation", 6);
+            headerRow.AddThemeConstantOverride("separation", 4);
             headerRow.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            headerRow.SizeFlagsVertical = SizeFlags.ShrinkCenter;
             _contentContainer.AddChild(headerRow);
 
             if (!_message.IsLocalPlayer)
@@ -404,7 +399,7 @@ public partial class HistoryPanel : Control
             _senderLabel = new Label();
             _senderLabel.Text = _message.SenderName ?? "Unknown";
             _senderLabel.AddThemeColorOverride("font_color", _message.IsLocalPlayer ? StsUiStyles.Blue : StsUiStyles.Orange);
-            _senderLabel.AddThemeFontSizeOverride("font_size", 13);
+            _senderLabel.AddThemeFontSizeOverride("font_size", 12);
             _senderLabel.SizeFlagsVertical = SizeFlags.ShrinkCenter;
             headerRow.AddChild(_senderLabel);
 
@@ -420,7 +415,7 @@ public partial class HistoryPanel : Control
                     characterNameLabel.Text = _characterModel.Id.Entry;
                 }
                 characterNameLabel.AddThemeColorOverride("font_color", _characterModel.NameColor);
-                characterNameLabel.AddThemeFontSizeOverride("font_size", 12);
+                characterNameLabel.AddThemeFontSizeOverride("font_size", 11);
                 characterNameLabel.SizeFlagsVertical = SizeFlags.ShrinkCenter;
                 headerRow.AddChild(characterNameLabel);
             }
@@ -437,13 +432,15 @@ public partial class HistoryPanel : Control
 
             ParseItemTags(_message.Content ?? "");
             _messageLabel = new RichTextLabel();
-            _messageLabel.CustomMinimumSize = new Vector2(0, 28);
+            _messageLabel.CustomMinimumSize = new Vector2(0, 24);
             _messageLabel.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+            _messageLabel.SizeFlagsVertical = SizeFlags.ShrinkBegin;
             _messageLabel.BbcodeEnabled = true;
             _messageLabel.FitContent = true;
             _messageLabel.ScrollActive = false;
             _messageLabel.AddThemeColorOverride("default_color", StsUiStyles.TextPrimary);
-            _messageLabel.AddThemeFontSizeOverride("normal_font_size", 13);
+            _messageLabel.AddThemeFontSizeOverride("normal_font_size", 12);
+            _messageLabel.AddThemeConstantOverride("line_separation", 2);
             _contentContainer.AddChild(_messageLabel);
 
             var displayText = BuildDisplayText(_message.Content ?? "");
@@ -452,28 +449,31 @@ public partial class HistoryPanel : Control
             _messageLabel.MetaHoverEnded += OnMetaHoverEnded;
 
             _metaRow = new HBoxContainer();
-            _metaRow.AddThemeConstantOverride("separation", 12);
+            _metaRow.AddThemeConstantOverride("separation", 8);
+            _metaRow.SizeFlagsVertical = SizeFlags.ShrinkCenter;
             _contentContainer.AddChild(_metaRow);
 
             _timeLabel = new Label();
-            _timeLabel.Text = _message.Timestamp.ToString("HH:mm:ss");
+            _timeLabel.Text = _message.Timestamp.ToString("yyyy.M.d - H:mm:ss");
             _timeLabel.AddThemeColorOverride("font_color", StsUiStyles.TextMuted);
             _timeLabel.AddThemeFontSizeOverride("font_size", 10);
+            _timeLabel.SizeFlagsVertical = SizeFlags.ShrinkCenter;
             _metaRow.AddChild(_timeLabel);
 
             _playTimeLabel = new Label();
             _playTimeLabel.Text = $"Play: {_message.PlayTime:hh\\:mm\\:ss}";
             _playTimeLabel.AddThemeColorOverride("font_color", StsUiStyles.TextMuted);
             _playTimeLabel.AddThemeFontSizeOverride("font_size", 10);
+            _playTimeLabel.SizeFlagsVertical = SizeFlags.ShrinkCenter;
             _metaRow.AddChild(_playTimeLabel);
         }
 
         private PanelContainer CreateAvatarIcon()
         {
             var avatarIcon = new TextureRect();
-            avatarIcon.CustomMinimumSize = new Vector2(28, 28);
+            avatarIcon.CustomMinimumSize = new Vector2(20, 20);
             avatarIcon.StretchMode = Godot.TextureRect.StretchModeEnum.KeepAspectCentered;
-            avatarIcon.ExpandMode = Godot.TextureRect.ExpandModeEnum.IgnoreSize;
+            avatarIcon.ExpandMode = TextureRect.ExpandModeEnum.IgnoreSize;
             avatarIcon.SizeFlagsVertical = SizeFlags.ShrinkCenter;
 
             if (_characterModel != null)
@@ -489,11 +489,11 @@ public partial class HistoryPanel : Control
             }
 
             var avatarBackground = new PanelContainer();
-            avatarBackground.CustomMinimumSize = new Vector2(32, 32);
+            avatarBackground.CustomMinimumSize = new Vector2(24, 24);
             avatarBackground.SizeFlagsVertical = SizeFlags.ShrinkCenter;
             var bgStyle = new StyleBoxFlat();
             bgStyle.BgColor = new Color(0.12f, 0.1f, 0.08f, 0.9f);
-            bgStyle.SetCornerRadiusAll(4);
+            bgStyle.SetCornerRadiusAll(3);
             bgStyle.SetContentMarginAll(2);
             bgStyle.BorderColor = new Color(0.3f, 0.25f, 0.2f, 1.0f);
             bgStyle.SetBorderWidthAll(1);
@@ -588,7 +588,7 @@ public partial class HistoryPanel : Control
                 result = result.Remove(match.Index, match.Length).Insert(match.Index, newTag);
             }
 
-            return $"[center]{result}[/center]";
+            return result;
         }
 
         private void OnMetaHoverStarted(Variant meta)

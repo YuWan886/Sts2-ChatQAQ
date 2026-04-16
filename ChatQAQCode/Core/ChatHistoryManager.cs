@@ -15,8 +15,16 @@ public class ChatHistoryManager
 
     private ChatSession _currentSession = null!;
     private static readonly string SavePath = "user://chat_history.json";
+    private bool _isInitialized = false;
 
     private ChatHistoryManager() { }
+
+    public void Initialize()
+    {
+        if (_isInitialized) return;
+        LoadFromFile();
+        _isInitialized = true;
+    }
 
     public void AddMessage(ChatMessage message)
     {

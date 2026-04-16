@@ -86,6 +86,8 @@ public class ChatManager : IDisposable
         MainFile.Logger.Info($"ChatManager: Received network message from {message.SenderName}");
 
         message.MentionedPlayerIds = _mentionSystem.DetectMentions(message.Content);
+        message.SessionId = CurrentSession?.SessionId ?? string.Empty;
+        message.PlayTime = GetPlayTime();
         MainFile.Logger.Info($"ChatManager: Detected {message.MentionedPlayerIds.Count} mentions in message");
 
         _historyManager.AddMessage(message);
@@ -139,7 +141,7 @@ public class ChatManager : IDisposable
         };
 
         _historyManager.AddSession(CurrentSession);
-        _historyManager.LoadFromFile();
+        _historyManager.SaveToFile();
 
         MainFile.Logger.Info($"New chat session started: {CurrentSession.SessionId}");
     }

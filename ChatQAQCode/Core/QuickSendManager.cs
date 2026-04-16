@@ -482,13 +482,13 @@ public class QuickSendManager : IDisposable
             {
                 var separator = GetLocalizedString("quick_send.power_list_separator", ", ");
                 var andMore = GetLocalizedString("quick_send.and_more", "等{0}个");
-                sb.Append(" [");
+                sb.Append(" (");
                 sb.Append(string.Join(separator, powerList.GetRange(0, Math.Min(powerList.Count, 3))));
                 if (powerList.Count > 3)
                 {
                     sb.Append(string.Format(andMore, powerList.Count - 3));
                 }
-                sb.Append("]");
+                sb.Append(")");
             }
         }
 

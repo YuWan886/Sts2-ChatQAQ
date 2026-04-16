@@ -170,6 +170,7 @@ public static class NRunPatch
         if (runState != null)
         {
             MainFile.SetLocalPlayerFromRunState(runState);
+            ChatHistoryManager.Instance.Initialize();
             ChatManager.Instance.StartNewSession();
             ChatNetworkManager.Instance.Initialize();
         }
