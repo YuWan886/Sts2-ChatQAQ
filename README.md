@@ -29,7 +29,7 @@
 
 ### 安装方法
 
-1. 下载模组 [Release](https://github.com/YuWan886/Sts2-ChatQAQ/releases/latest) | [NexusMods](https://www.nexusmods.com/games/slaythespire2/mods/529) | [备用下载](https://pan.quark.cn/s/4a8dd2826230)
+1. 下载模组 [Release](https://github.com/YuWan886/Sts2-ChatQAQ/releases/latest) | [NexusMods](https://www.nexusmods.com/slaythespire2/mods/529) | [备用下载](https://pan.quark.cn/s/4a8dd2826230)
 2. 将模组文件解压后放入游戏的 `mods` 文件夹
 3. 在游戏中按 `T` 键（默认）打开聊天框
 
@@ -58,7 +58,7 @@
 
 ### Installation
 
-1. Download the mod [Release](https://github.com/YuWan886/Sts2-ChatQAQ/releases/latest) | [NexusMods](https://www.nexusmods.com/games/slaythespire2/mods/529) | [备用下载](https://pan.quark.cn/s/4a8dd2826230)
+1. Download the mod [Release](https://github.com/YuWan886/Sts2-ChatQAQ/releases/latest) | [NexusMods](https://www.nexusmods.com/slaythespire2/mods/529) | [备用下载](https://pan.quark.cn/s/4a8dd2826230)
 2. Extract the mod files and place them in the game's `mods` folder.
 3. Press `T` (default) in-game to open the chat box
 
