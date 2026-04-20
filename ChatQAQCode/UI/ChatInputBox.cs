@@ -266,12 +266,11 @@ public partial class ChatInputBox : Control
                 var config = ConfigManager.Instance.CurrentConfig;
                 if (keyEvent.Keycode == config.Hotkey)
                 {
-                    if (Visible && _lineEdit.HasFocus())
+                    if (Visible && (_lineEdit.HasFocus() || HotkeyManager.Instance.IsInputFocused))
                     {
+                        GetViewport().SetInputAsHandled();
                         return;
                     }
-                    Toggle();
-                    GetViewport().SetInputAsHandled();
                 }
             }
         }
@@ -360,11 +359,15 @@ public partial class ChatInputBox : Control
     {
         if (Visible)
         {
+            _lineEdit.ReleaseFocus();
+            HotkeyManager.Instance.IsInputFocused = false;
             Hide();
         }
         else
         {
             Show();
+            _lineEdit.GrabFocus();
+            HotkeyManager.Instance.IsInputFocused = true;
         }
     }
 

@@ -48,7 +48,7 @@ public class HotkeyManager
 
         ProcessModifierKey(@event);
 
-        if (IsInputFocused) return;
+        if (IsInputFocused || IsAnyInputFieldFocused()) return;
 
         if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
         {
@@ -108,7 +108,7 @@ public class HotkeyManager
     private void ProcessQuickSendInput(InputEvent @event)
     {
         if (!_quickSendEnabled) return;
-        if (IsInputFocused) return;
+        if (IsInputFocused || IsAnyInputFieldFocused()) return;
         if (!_isModifierPressed) return;
 
         if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
@@ -124,7 +124,7 @@ public class HotkeyManager
     public bool IsHotkeyPressed(InputEvent @event)
     {
         if (!IsEnabled) return false;
-        if (IsInputFocused) return false;
+        if (IsInputFocused || IsAnyInputFieldFocused()) return false;
 
         if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
         {
@@ -193,5 +193,26 @@ public class HotkeyManager
             _quickSendModifierKey = config.QuickSendModifierKey;
             _quickSendMouseButton = config.QuickSendMouseButton;
         }
+    }
+
+    private bool IsAnyInputFieldFocused()
+    {
+        try
+        {
+            var sceneTree = Engine.GetMainLoop() as SceneTree;
+            if (sceneTree?.Root != null)
+            {
+                var focusOwner = sceneTree.Root.GetViewport()?.GuiGetFocusOwner();
+                if (focusOwner != null)
+                {
+                    return focusOwner is LineEdit || focusOwner is TextEdit;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Debug($"Failed to check focus owner: {ex.Message}");
+        }
+        return false;
     }
 }
