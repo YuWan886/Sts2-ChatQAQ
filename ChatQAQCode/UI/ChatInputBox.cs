@@ -255,7 +255,7 @@ public partial class ChatInputBox : Control
             }
             else if (keyEvent.Keycode == Key.Escape)
             {
-                if (Visible && _isMouseInside)
+                if (Visible && (_isMouseInside || _lineEdit.HasFocus()))
                 {
                     OnClosePressed();
                     GetViewport().SetInputAsHandled();
