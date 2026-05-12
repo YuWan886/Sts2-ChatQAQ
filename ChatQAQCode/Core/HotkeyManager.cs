@@ -109,16 +109,34 @@ public class HotkeyManager
     {
         if (!_quickSendEnabled) return;
         if (IsInputFocused || IsAnyInputFieldFocused()) return;
-        if (!_isModifierPressed) return;
 
         if (@event is InputEventMouseButton mouseEvent && mouseEvent.Pressed)
         {
-            if (mouseEvent.ButtonIndex == _quickSendMouseButton)
+            if (mouseEvent.ButtonIndex == _quickSendMouseButton && IsQuickSendModifierPressed(mouseEvent))
             {
                 OnQuickSendTriggered?.Invoke(mouseEvent.Position);
-                MainFile.Logger.Info($"QuickSend triggered: Ctrl+Right Click at {mouseEvent.Position}");
+                MainFile.Logger.Info($"QuickSend triggered: {GetQuickSendModifierKeyName()}+{_quickSendMouseButton} Click at {mouseEvent.Position}");
             }
         }
+    }
+
+    private bool IsQuickSendModifierPressed(InputEventMouseButton mouseEvent)
+    {
+        if (_quickSendModifierKey == Key.Ctrl)
+            return mouseEvent.CtrlPressed;
+        if (_quickSendModifierKey == Key.Shift)
+            return mouseEvent.ShiftPressed;
+        if (_quickSendModifierKey == Key.Alt)
+            return mouseEvent.AltPressed;
+        if (_quickSendModifierKey == Key.Meta)
+            return mouseEvent.MetaPressed;
+
+        return mouseEvent.CtrlPressed;
+    }
+
+    private string GetQuickSendModifierKeyName()
+    {
+        return _quickSendModifierKey.ToString();
     }
 
     public bool IsHotkeyPressed(InputEvent @event)
