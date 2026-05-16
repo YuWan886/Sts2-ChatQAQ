@@ -16,8 +16,8 @@ public class ChatNetworkManager : IDisposable
 
     public bool IsConnected { get; private set; }
     public bool IsMultiplayer { get; private set; }
-    private bool _isInitialized = false;
     private bool _disposed = false;
+    private INetGameService? _registeredNetService = null;
 
     private ChatNetworkManager()
     {
@@ -25,19 +25,10 @@ public class ChatNetworkManager : IDisposable
 
     public void Initialize()
     {
-        if (_isInitialized)
-        {
-            MainFile.Logger.Info("ChatNetworkManager: Already initialized, updating multiplayer status");
-            CheckMultiplayerStatus();
-            UpdateOnlinePlayersList();
-            return;
-        }
-
         MainFile.Logger.Info("ChatNetworkManager: Initializing...");
         CheckMultiplayerStatus();
         RegisterMessageHandlers();
         UpdateOnlinePlayersList();
-        _isInitialized = true;
         MainFile.Logger.Info("ChatNetworkManager: Initialization complete");
     }
 
@@ -51,10 +42,32 @@ public class ChatNetworkManager : IDisposable
     private void RegisterMessageHandlers()
     {
         var netService = RunManager.Instance?.NetService;
+
+        // Already registered on the same NetService instance — nothing to do
+        if (_registeredNetService == netService)
+        {
+            MainFile.Logger.Info("ChatNetworkManager: Handler already registered on current NetService");
+            return;
+        }
+
+        // Unregister from previous NetService if it's a different instance
+        if (_registeredNetService != null)
+        {
+            _registeredNetService.UnregisterMessageHandler<ChatBubbleMessage>(HandleChatBubbleMessage);
+            MainFile.Logger.Info("ChatNetworkManager: Unregistered ChatBubbleMessage handler from previous NetService");
+        }
+
+        // Register on the new NetService
         if (netService != null)
         {
             netService.RegisterMessageHandler<ChatBubbleMessage>(HandleChatBubbleMessage);
-            MainFile.Logger.Info("ChatNetworkManager: Registered ChatBubbleMessage handler");
+            MainFile.Logger.Info($"ChatNetworkManager: Registered ChatBubbleMessage handler on {netService.GetType().Name}");
+            _registeredNetService = netService;
+        }
+        else
+        {
+            _registeredNetService = null;
+            MainFile.Logger.Warn("ChatNetworkManager: No NetService available to register handler");
         }
     }
 
@@ -62,10 +75,10 @@ public class ChatNetworkManager : IDisposable
     {
         if (_disposed) return;
 
-        var netService = RunManager.Instance?.NetService;
-        if (netService != null)
+        if (_registeredNetService != null)
         {
-            netService.UnregisterMessageHandler<ChatBubbleMessage>(HandleChatBubbleMessage);
+            _registeredNetService.UnregisterMessageHandler<ChatBubbleMessage>(HandleChatBubbleMessage);
+            _registeredNetService = null;
         }
 
         _disposed = true;
