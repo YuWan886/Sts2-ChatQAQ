@@ -1,8 +1,14 @@
 using ChatQAQ.ChatQAQCode.Data;
 using ChatQAQ.ChatQAQCode.UI;
 using ChatQAQ.ChatQAQCode.Networking;
+using Godot;
+using MegaCrit.Sts2.Core.Entities.Players;
+using MegaCrit.Sts2.Core.Entities.Creatures;
+using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Nodes.Vfx;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.Nodes;
+using MegaCrit.Sts2.Core.Platform;
 using MegaCrit.Sts2.Core.Runs;
 
 namespace ChatQAQ.ChatQAQCode.Core;
@@ -237,16 +243,48 @@ public class ChatManager : IDisposable
 
                 try
                 {
-                    if (NCombatRoom.Instance == null)
+                    var combatRoom = NCombatRoom.Instance;
+                    Node? parentNode;
+                    bool isInCombat;
+
+                    if (combatRoom != null)
                     {
-                        return;
+                        parentNode = combatRoom.CombatVfxContainer;
+                        isInCombat = true;
+                    }
+                    else
+                    {
+                        // Non-combat room: use NRun.Instance as parent
+                        parentNode = (Node?)NRun.Instance ?? NGame.Instance;
+                        isInCombat = false;
+                        if (parentNode == null)
+                        {
+                            MainFile.Logger.Warn("ShowSpeechBubble: No parent node available (NRun and NGame are null)");
+                            return;
+                        }
                     }
 
-                    if (hasCustomTags)
+                    // Calculate bubble position for non-combat rooms
+                    Vector2? overridePosition = null;
+                    if (!isInCombat)
                     {
+                        overridePosition = GetBubblePosition(player, creature, runState);
+                    }
+
+                    if (hasCustomTags || !isInCombat)
+                    {
+                        // Use ChatBubbleWithHoverTips for custom tags OR non-combat rooms
+                        // (NSpeechBubbleVfx.Create with Creature overload requires NCombatRoom.Instance)
+                        var bubbleContent = content;
+                        if (!isInCombat)
+                        {
+                            // Prepend sender name in non-combat rooms so players can identify who is talking
+                            var senderName = PlatformUtil.GetPlayerName(RunManager.Instance.NetService.Platform, player.NetId);
+                            bubbleContent = $"{senderName}：{content}";
+                        }
                         var bubble = new ChatBubbleWithHoverTips();
-                        bubble.Setup(content, creature!, duration);
-                        NCombatRoom.Instance.CombatVfxContainer.AddChild(bubble);
+                        bubble.Setup(bubbleContent, creature!, duration, overridePosition);
+                        parentNode.AddChild(bubble);
                         bubble.AnimateIn();
                     }
                     else
@@ -254,7 +292,7 @@ public class ChatManager : IDisposable
                         var bubble = NSpeechBubbleVfx.Create(displayContent, creature, duration, VfxColor.White);
                         if (bubble != null)
                         {
-                            NCombatRoom.Instance.CombatVfxContainer.AddChild(bubble);
+                            parentNode.AddChild(bubble);
                         }
                     }
 
@@ -268,6 +306,122 @@ public class ChatManager : IDisposable
                 break;
             }
         }
+    }
+
+    /// <summary>
+    /// Calculate the screen position for a speech bubble in a non-combat room.
+    /// Returns null if in combat (let NCreature-based positioning handle it).
+    /// </summary>
+    private static Vector2? GetBubblePosition(Player player, Creature creature, RunState runState)
+    {
+        try
+        {
+            // 1. Try NRestSiteRoom: use NRestSiteCharacter positions
+            var restSite = NRestSiteRoom.Instance;
+            if (restSite != null)
+            {
+                foreach (var character in restSite.Characters)
+                {
+                    if (character.Player.NetId == player.NetId)
+                    {
+                        // Use the character's thought anchor or global position
+                        var pos = character.GlobalPosition;
+                        // Offset upward to appear above the character's head
+                        pos.Y -= 120f;
+                        return pos;
+                    }
+                }
+            }
+
+            // 2. Try NMerchantRoom: use PlayerVisuals list matched by player index
+            var merchant = NMerchantRoom.Instance;
+            if (merchant != null)
+            {
+                var visuals = merchant.PlayerVisuals;
+                // Build a mapping: find the index of this player among same-side players
+                int merchantIndex = 0;
+                foreach (var p in runState.Players)
+                {
+                    if (p.Creature?.Side == creature.Side)
+                    {
+                        if (p.NetId == player.NetId && merchantIndex < visuals.Count)
+                        {
+                            var pos = visuals[merchantIndex].GlobalPosition;
+                            pos.Y -= 120f;
+                            return pos;
+                        }
+                        merchantIndex++;
+                    }
+                }
+                // If not matched, fall through to calculated position
+            }
+
+            // 3. For rooms without character visuals, calculate position based on player side and index
+            return CalculateDefaultBubblePosition(player, creature, runState);
+        }
+        catch (Exception ex)
+        {
+            MainFile.Logger.Warn($"GetBubblePosition failed: {ex.Message}");
+            return CalculateDefaultBubblePosition(player, creature, runState);
+        }
+    }
+
+    /// <summary>
+    /// Calculate a default bubble position based on the player's side and their index
+    /// among same-side players. Player-side characters are on the left, enemies on the right.
+    /// </summary>
+    private static Vector2 CalculateDefaultBubblePosition(Player player, Creature creature, RunState runState)
+    {
+        CombatSide side = creature.Side;
+        
+        // Count same-side players to determine offsets
+        int sameSideIndex = 0;
+        int sameSideCount = 0;
+        foreach (var p in runState.Players)
+        {
+            if (p.Creature?.Side == side)
+            {
+                if (p.NetId == player.NetId)
+                {
+                    sameSideIndex = sameSideCount;
+                }
+                sameSideCount++;
+            }
+        }
+
+        float xPos;
+        if (side == CombatSide.Player)
+        {
+            // Player-side: position on the left side of screen
+            // Spread players vertically and slightly horizontally
+            float baseX = 200f + sameSideIndex * 60f;
+            xPos = baseX;
+        }
+        else
+        {
+            // Enemy-side: position on the right side of screen
+            float baseX = 1720f - sameSideIndex * 60f;
+            xPos = baseX;
+        }
+
+        // Vertical position: center area, offset by index
+        float yPos = 400f - sameSideIndex * 100f;
+
+        return new Vector2(xPos, yPos);
+    }
+
+    /// <summary>
+    /// Recursively find the first node of type T in the tree.
+    /// </summary>
+    private static T? FindNodeOfType<T>(Node root) where T : Node
+    {
+        if (root is T match) return match;
+        foreach (var child in root.GetChildren())
+        {
+            var result = FindNodeOfType<T>(child);
+            if (result != null) return result;
+        }
+        return default;
     }
 
     private TimeSpan GetPlayTime()

@@ -21,6 +21,8 @@
 
 - 💬 **实时聊天** - 在游戏内发送和接收消息，支持多人联机
 - 🎈 **聊天气泡** - 消息以气泡形式在角色头顶显示，沉浸感十足
+- 🏠 **全场景聊天** - 不再局限于战斗房间，休息处、商店、事件等所有界面均可聊天
+- 👤 **玩家名标识** - 非战斗房间中气泡自动显示发送者名称，轻松分辨发言人
 - 📜 **历史记录** - 完整的聊天记录管理，支持查看历史消息
 - ⌨️ **快捷键支持** - 自定义快捷键快速打开/关闭聊天输入框
 - 🔔 **提及通知** - 当被其他玩家提及时发出通知和提示音
@@ -50,6 +52,8 @@
 
 - 💬 **Real-time Chat** - Send and receive messages in-game with multiplayer support
 - 🎈 **Speech Bubbles** - Messages display as bubbles above characters for immersive experience
+- 🏠 **All-Scene Chat** - Chat works in all rooms, not just combat — rest sites, shops, events, and more
+- 👤 **Player Name Labels** - Bubbles in non-combat rooms automatically show the sender's name for easy identification
 - 📜 **History Management** - Complete chat history with message retrieval
 - ⌨️ **Hotkey Support** - Customizable hotkeys to quickly toggle chat input
 - 🔔 **Mention Notifications** - Audio and visual notifications when mentioned by other players

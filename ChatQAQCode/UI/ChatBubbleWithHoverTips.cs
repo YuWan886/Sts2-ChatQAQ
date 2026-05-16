@@ -6,6 +6,8 @@ using MegaCrit.Sts2.Core.Nodes.HoverTips;
 using MegaCrit.Sts2.Core.Entities.Creatures;
 using MegaCrit.Sts2.Core.Assets;
 using MegaCrit.Sts2.Core.Nodes.Rooms;
+using MegaCrit.Sts2.Core.Nodes.Combat;
+using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Combat;
 using MegaCrit.Sts2.Core.Nodes.Vfx.Utilities;
 
@@ -34,6 +36,8 @@ public partial class ChatBubbleWithHoverTips : Control
     private bool _pendingSetup = false;
     private string? _pendingText;
     private double _pendingDuration = 3.0;
+    private Vector2? _pendingPosition;
+    private Vector2? _overridePosition;
     
     private const float HoverTipScale = 0.6f;
 
@@ -102,9 +106,10 @@ public partial class ChatBubbleWithHoverTips : Control
         
         if (_pendingSetup && _pendingText != null)
         {
-            DoSetup(_pendingText, _speaker!, _pendingDuration);
+            DoSetup(_pendingText, _speaker!, _pendingDuration, _pendingPosition);
             _pendingSetup = false;
             _pendingText = null;
+            _pendingPosition = null;
         }
     }
 
@@ -141,25 +146,27 @@ public partial class ChatBubbleWithHoverTips : Control
         _mainLabel.MetaHoverEnded += OnMetaHoverEnded;
     }
 
-    public void Setup(string text, Creature speaker, double duration)
+    public void Setup(string text, Creature speaker, double duration, Vector2? overridePosition = null)
     {
         if (!_isReady)
         {
             _pendingSetup = true;
             _pendingText = text;
             _pendingDuration = duration;
+            _pendingPosition = overridePosition;
             _speaker = speaker;
             return;
         }
 
-        DoSetup(text, speaker, duration);
+        DoSetup(text, speaker, duration, overridePosition);
     }
     
-    private void DoSetup(string text, Creature speaker, double duration)
+    private void DoSetup(string text, Creature speaker, double duration, Vector2? overridePosition = null)
     {
         _rawText = text;
         _speaker = speaker;
         _displayDuration = duration;
+        _overridePosition = overridePosition;
         
         MainFile.Logger.Info($"ChatBubbleWithHoverTips.DoSetup: duration={duration}, _displayDuration={_displayDuration}");
         
@@ -305,12 +312,39 @@ public partial class ChatBubbleWithHoverTips : Control
     {
         try
         {
+            // If an override position was provided, use it directly
+            if (_overridePosition.HasValue)
+            {
+                GlobalPosition = _overridePosition.Value;
+                return;
+            }
+
+            NCreature? creatureNode = null;
             var combatRoom = NCombatRoom.Instance;
-            if (combatRoom == null) return;
-            
-            var creatureNode = combatRoom.GetCreatureNode(speaker);
-            if (creatureNode == null) return;
-            
+
+            if (combatRoom != null)
+            {
+                creatureNode = combatRoom.GetCreatureNode(speaker);
+            }
+            else
+            {
+                // Non-combat room: search the tree for the NCreature node
+                creatureNode = FindCreatureNode(NRun.Instance, speaker);
+                if (creatureNode == null)
+                {
+                    // Fallback: try NGame as root
+                    creatureNode = FindCreatureNode(NGame.Instance, speaker);
+                }
+            }
+
+            if (creatureNode == null)
+            {
+                // Last resort: position at center of screen
+                MainFile.Logger.Warn("PositionBubble: Could not find creature node, using default position");
+                GlobalPosition = new Vector2(400f, 300f);
+                return;
+            }
+
             Vector2 spawnPos;
             if (creatureNode.Visuals.TalkPosition != null)
             {
@@ -335,6 +369,27 @@ public partial class ChatBubbleWithHoverTips : Control
         {
             MainFile.Logger.Warn($"Failed to position bubble: {ex.Message}");
         }
+    }
+
+    /// <summary>
+    /// Recursively search for an NCreature node whose Entity matches the given creature.
+    /// </summary>
+    private static NCreature? FindCreatureNode(Node? root, Creature creature)
+    {
+        if (root == null) return null;
+
+        if (root is NCreature nCreature && nCreature.Entity == creature)
+        {
+            return nCreature;
+        }
+
+        foreach (var child in root.GetChildren())
+        {
+            var result = FindCreatureNode(child, creature);
+            if (result != null) return result;
+        }
+
+        return null;
     }
 
     public void AnimateIn()

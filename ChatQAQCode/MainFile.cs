@@ -3,8 +3,6 @@ using HarmonyLib;
 using MegaCrit.Sts2.Core.Modding;
 using MegaCrit.Sts2.Core.Nodes;
 using MegaCrit.Sts2.Core.Runs;
-using MegaCrit.Sts2.Core.Entities.Players;
-using MegaCrit.Sts2.Core.Helpers;
 using MegaCrit.Sts2.Core.Context;
 using MegaCrit.Sts2.Core.Platform;
 using ChatQAQ.ChatQAQCode.Core;

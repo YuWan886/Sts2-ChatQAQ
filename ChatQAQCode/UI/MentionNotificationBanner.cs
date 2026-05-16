@@ -1,11 +1,8 @@
-using System.Threading.Tasks;
 using Godot;
 using MegaCrit.Sts2.Core.Audio.Debug;
 using MegaCrit.Sts2.Core.Helpers;
-using MegaCrit.Sts2.Core.Nodes.GodotExtensions;
 using MegaCrit.Sts2.Core.TestSupport;
 using ChatQAQ.ChatQAQCode.Core;
-using MegaCrit.Sts2.addons.mega_text;
 
 namespace ChatQAQ.ChatQAQCode.UI;
 

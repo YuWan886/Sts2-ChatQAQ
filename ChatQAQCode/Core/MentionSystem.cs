@@ -1,9 +1,7 @@
-using System;
 using System.Text.RegularExpressions;
 using Godot;
 using ChatQAQ.ChatQAQCode.Data;
 using ChatQAQ.ChatQAQCode.UI;
-using MegaCrit.Sts2.Core.Nodes.Rooms;
 
 namespace ChatQAQ.ChatQAQCode.Core;
 

@@ -5,8 +5,6 @@ using ChatQAQ.ChatQAQCode.Data;
 using MegaCrit.Sts2.Core.HoverTips;
 using MegaCrit.Sts2.Core.Nodes.HoverTips;
 using MegaCrit.Sts2.Core.Models;
-using MegaCrit.Sts2.Core.Nodes;
-using MegaCrit.Sts2.Core.Entities.Characters;
 
 namespace ChatQAQ.ChatQAQCode.UI;
 

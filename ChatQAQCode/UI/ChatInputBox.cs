@@ -2,7 +2,6 @@ using Godot;
 using ChatQAQ.ChatQAQCode.Core;
 using ChatQAQ.ChatQAQCode.Data;
 using ChatQAQ.ChatQAQCode.Networking;
-using System.Collections.Generic;
 
 namespace ChatQAQ.ChatQAQCode.UI;
 

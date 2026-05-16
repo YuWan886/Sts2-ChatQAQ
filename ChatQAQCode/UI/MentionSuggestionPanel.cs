@@ -1,5 +1,4 @@
 using Godot;
-using System.Collections.Generic;
 using ChatQAQ.ChatQAQCode.Data;
 using ChatQAQ.ChatQAQCode.Core;
 
